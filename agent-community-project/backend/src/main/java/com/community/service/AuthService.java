@@ -75,6 +75,9 @@ public class AuthService {
         if (userDetails.getAvatar() != null) {
             user.setAvatar(userDetails.getAvatar());
         }
+        if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
+        }
         
         user = userRepository.save(user);
         return toDTO(user);

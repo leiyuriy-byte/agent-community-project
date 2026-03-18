@@ -26,6 +26,8 @@ public class User {
 
     @Column(nullable = false)
     private String role = "user";
+    
+    private boolean enabled = true;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

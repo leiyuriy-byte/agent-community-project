@@ -15,7 +15,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 const proxy = (apiPath) => {
     return async (req, res) => {
         try {
-            const url = `${JAVA_API}${apiPath}`;
+            // 替换路径参数
+            let targetPath = apiPath;
+            const pathParams = apiPath.match(/:(\w+)/g);
+            if (pathParams) {
+                pathParams.forEach(param => {
+                    const paramName = param.slice(1);
+                    targetPath = targetPath.replace(param, req.params[paramName]);
+                });
+            }
+            
+            const url = `${JAVA_API}${targetPath}`;
             const params = { ...req.query };
             
             let data = req.body;
@@ -74,6 +84,20 @@ app.post('/api/posts/:postId/comments', proxy('/api/posts/:postId/comments'));
 // 板块接口
 app.get('/api/boards', proxy('/api/boards'));
 app.post('/api/boards', proxy('/api/boards'));
+
+// 管理后台接口
+app.get('/api/admin/stats', proxy('/api/admin/stats'));
+app.get('/api/admin/users', proxy('/api/admin/users'));
+app.put('/api/admin/users/:id/status', proxy('/api/admin/users/:id/status'));
+app.put('/api/admin/users/:id/role', proxy('/api/admin/users/:id/role'));
+app.get('/api/admin/posts', proxy('/api/admin/posts'));
+app.put('/api/admin/posts/:id/pin', proxy('/api/admin/posts/:id/pin'));
+app.delete('/api/admin/posts/:id', proxy('/api/admin/posts/:id'));
+app.get('/api/admin/comments', proxy('/api/admin/comments'));
+app.delete('/api/admin/comments/:id', proxy('/api/admin/comments/:id'));
+app.post('/api/admin/boards', proxy('/api/admin/boards'));
+app.delete('/api/admin/boards/:id', proxy('/api/admin/boards/:id'));
+app.get('/api/admin/hot-posts', proxy('/api/admin/hot-posts'));
 
 // 静态页面路由
 app.get('/agent-community.html', (req, res) => {

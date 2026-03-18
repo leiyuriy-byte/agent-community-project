@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .antMatchers("/api/boards").permitAll()
                 .antMatchers("/api/posts").permitAll()
                 .antMatchers("/api/posts/*").permitAll()
+                .antMatchers("/api/admin/**").permitAll()
                 .anyRequest().authenticated()
             .and()
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
