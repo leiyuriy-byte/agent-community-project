@@ -59,9 +59,14 @@ public class PostController {
     }
     
     @PostMapping("/{id}/like")
-    public ResponseEntity<Void> likePost(@PathVariable Long id) {
-        postService.likePost(id);
+    public ResponseEntity<Void> likePost(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        postService.likePost(id, user.getId());
         return ResponseEntity.ok().build();
+    }
+    
+    @GetMapping("/user/{userId}/liked")
+    public ResponseEntity<List<PostDTO>> getUserLikedPosts(@PathVariable Long userId) {
+        return ResponseEntity.ok(postService.getLikedPostsByUser(userId));
     }
     
     @GetMapping("/user/{userId}")

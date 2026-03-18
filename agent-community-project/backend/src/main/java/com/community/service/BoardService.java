@@ -20,4 +20,8 @@ public class BoardService {
     public Board createBoard(Board board) {
         return boardRepository.save(board);
     }
+    
+    public void deleteBoard(Long id) {
+        boardRepository.deleteById(id);
+    }
 }

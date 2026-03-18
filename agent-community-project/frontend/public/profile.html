@@ -168,8 +168,33 @@
             } else {
                 document.getElementById('postsList').style.display = 'none';
                 document.getElementById('likedList').style.display = 'block';
-                // TODO: 加载点赞列表
-                document.getElementById('likedList').innerHTML = '<p style="color:#888;text-align:center;">功能开发中</p>';
+                loadLikedPosts();
+            }
+        }
+
+        async function loadLikedPosts() {
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch(`${API}/api/posts/user/${currentUser.id}/liked`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const posts = await res.json();
+                
+                const list = document.getElementById('likedList');
+                if (!posts || posts.length === 0) {
+                    list.innerHTML = '<p style="color:#888;text-align:center;">暂无点赞</p>';
+                    return;
+                }
+                
+                list.innerHTML = posts.map(post => `
+                    <div class="post-card" onclick="location.href='/post.html?id=${post.id}'">
+                        <div class="post-title">👍 ${post.title}</div>
+                        <div class="post-meta">${post.nickname} · ${post.board} · ${new Date(post.createdAt).toLocaleString()}</div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+                document.getElementById('likedList').innerHTML = '<p style="color:#888;text-align:center;">加载失败</p>';
             }
         }
 

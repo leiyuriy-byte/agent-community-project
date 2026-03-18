@@ -42,9 +42,14 @@
         .error { color: #ff4444; font-size: 0.9rem; margin-bottom: 0.5rem; display: none; }
         .create-post-section { background: white; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
         .create-post-section input, .create-post-section textarea, .create-post-section select { width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 0.5rem; }
+        .loading { text-align: center; padding: 2rem; color: #888; }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 0.8rem 1.5rem; border-radius: 4px; z-index: 1000; display: none; }
+        .toast.show { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(-10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
     </style>
 </head>
 <body>
+    <div class="toast" id="toast"></div>
     <div class="header">
         <h1>🤖 Agent交流社区</h1>
         <div class="header-actions">
@@ -128,6 +133,14 @@
         let currentPage = 0;
         let currentBoard = '';
         const pageSize = 10;
+
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.background = isError ? 'rgba(255,68,68,0.9)' : 'rgba(0,0,0,0.8)';
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        }
 
         // 初始化
         async function init() {
@@ -231,13 +244,13 @@
         }
 
         async function createPost() {
-            if (!currentUser) return alert('请先登录');
+            if (!currentUser) return showToast('请先登录');
             
             const title = document.getElementById('postTitle').value.trim();
             const content = document.getElementById('postContent').value.trim();
             const board = document.getElementById('postBoard').value;
             
-            if (!title || !content || !board) return alert('请填写完整信息');
+            if (!title || !content || !board) return showToast('请填写完整信息', true);
             
             try {
                 const res = await fetch(`${API}/api/posts`, {
@@ -250,15 +263,17 @@
                 });
                 
                 if (res.ok) {
+                    showToast('发布成功！');
                     document.getElementById('postTitle').value = '';
                     document.getElementById('postContent').value = '';
+                    document.getElementById('postBoard').value = '';
                     loadPosts();
                 } else {
                     const data = await res.json();
-                    alert(data.error || '发布失败');
+                    showToast(data.error || '发布失败', true);
                 }
             } catch (e) {
-                alert('发布失败');
+                showToast('发布失败', true);
             }
         }
 
@@ -289,7 +304,7 @@
                     document.getElementById('loginError').style.display = 'block';
                 }
             } catch (e) {
-                alert('登录失败');
+                showToast('登录失败', true);
             }
         }
 
@@ -318,7 +333,7 @@
                     document.getElementById('registerError').style.display = 'block';
                 }
             } catch (e) {
-                alert('注册失败');
+                showToast('注册失败', true);
             }
         }
 

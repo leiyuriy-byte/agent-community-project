@@ -10,7 +10,7 @@
         .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; }
         .header h1 { font-size: 1.3rem; display: flex; justify-content: space-between; align-items: center; }
         .header a { color: white; text-decoration: none; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 1rem; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 1rem; }
         .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1rem; }
         .stat-card { background: white; border-radius: 8px; padding: 1.5rem; text-align: center; }
         .stat-card h3 { font-size: 2rem; color: #667eea; }
@@ -22,23 +22,40 @@
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 0.8rem; text-align: left; border-bottom: 1px solid #eee; }
         th { background: #f9f9f9; font-weight: 600; }
-        .btn { padding: 0.4rem 0.8rem; border: none; border-radius: 4px; cursor: pointer; }
+        .btn { padding: 0.4rem 0.8rem; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
         .btn-danger { background: #ff4444; color: white; }
         .btn-primary { background: #667eea; color: white; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        .btn-warning { background: #ff9800; color: white; }
+        .btn-success { background: #4caf50; color: white; }
+        .btn-sm { padding: 0.2rem 0.5rem; font-size: 0.8rem; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 100; }
         .modal.active { display: flex; }
-        .modal-content { background: white; border-radius: 8px; padding: 2rem; width: 90%; max-width: 400px; }
+        .modal-content { background: white; border-radius: 8px; padding: 2rem; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
+        .modal-content h2 { margin-bottom: 1rem; }
         .form-group { margin-bottom: 1rem; }
         .form-group label { display: block; margin-bottom: 0.3rem; color: #666; }
-        .form-group input { width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 4px; }
+        .form-group input, .form-group select { width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 4px; }
         .error { color: #ff4444; font-size: 0.9rem; margin-bottom: 0.5rem; display: none; }
+        .loading { text-align: center; padding: 2rem; color: #888; }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 0.8rem 1.5rem; border-radius: 4px; z-index: 1000; display: none; }
+        .toast.show { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(-10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        .tag { padding: 0.2rem 0.5rem; border-radius: 3px; font-size: 0.75rem; }
+        .tag-admin { background: #ff6b6b; color: white; }
+        .tag-user { background: #667eea; color: white; }
+        .pinned { color: #ff6b6b; }
     </style>
 </head>
 <body>
+    <div class="toast" id="toast"></div>
+    
     <div class="header">
         <h1>
             <span>🔧 管理后台</span>
-            <a href="/agent-community.html">← 返回首页</a>
+            <div>
+                <span id="adminInfo" style="margin-right:1rem;font-size:0.9rem;"></span>
+                <a href="/agent-community.html">← 返回首页</a>
+            </div>
         </h1>
     </div>
 
@@ -78,6 +95,7 @@
                             <th>昵称</th>
                             <th>邮箱</th>
                             <th>角色</th>
+                            <th>状态</th>
                             <th>注册时间</th>
                             <th>操作</th>
                         </tr>
@@ -95,6 +113,7 @@
                             <th>作者</th>
                             <th>板块</th>
                             <th>点赞</th>
+                            <th>状态</th>
                             <th>创建时间</th>
                             <th>操作</th>
                         </tr>
@@ -105,13 +124,14 @@
             
             <div id="boardsTab" style="display:none;">
                 <button class="btn btn-primary" onclick="showBoardModal()">+ 添加板块</button>
-                <table>
+                <table style="margin-top:1rem;">
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>名称</th>
                             <th>描述</th>
                             <th>创建时间</th>
+                            <th>操作</th>
                         </tr>
                     </thead>
                     <tbody id="boardsList"></tbody>
@@ -127,40 +147,54 @@
             <div class="error" id="loginError"></div>
             <div class="form-group">
                 <label>用户名</label>
-                <input type="text" id="adminUsername" />
+                <input type="text" id="adminUsername" placeholder="请输入管理员账号" />
             </div>
             <div class="form-group">
                 <label>密码</label>
-                <input type="password" id="adminPassword" />
+                <input type="password" id="adminPassword" placeholder="请输入密码" />
             </div>
-            <button class="btn btn-primary" onclick="adminLogin()">登录</button>
+            <button class="btn btn-primary btn-block" onclick="adminLogin()">登录</button>
         </div>
     </div>
 
     <!-- 板块弹窗 -->
     <div class="modal" id="boardModal">
         <div class="modal-content">
-            <h2>添加板块</h2>
+            <h2 id="boardModalTitle">添加板块</h2>
             <div class="form-group">
                 <label>名称</label>
-                <input type="text" id="boardName" />
+                <input type="text" id="boardName" placeholder="板块名称" />
             </div>
             <div class="form-group">
                 <label>描述</label>
-                <input type="text" id="boardDesc" />
+                <input type="text" id="boardDesc" placeholder="板块描述" />
             </div>
-            <button class="btn btn-primary" onclick="createBoard()">创建</button>
-            <button class="btn" onclick="closeModal('boardModal')" style="margin-left:0.5rem;">取消</button>
+            <button class="btn btn-primary" onclick="saveBoard()">保存</button>
+            <button class="btn btn-secondary" onclick="closeModal('boardModal')" style="margin-left:0.5rem;">取消</button>
         </div>
     </div>
 
     <script>
         const API = '';
         let currentUser = null;
+        let editingBoardId = null;
+
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.background = isError ? 'rgba(255,68,68,0.9)' : 'rgba(0,0,0,0.8)';
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        }
 
         async function adminLogin() {
             const username = document.getElementById('adminUsername').value;
             const password = document.getElementById('adminPassword').value;
+            
+            if (!username || !password) {
+                showToast('请输入用户名和密码', true);
+                return;
+            }
             
             try {
                 const res = await fetch(`${API}/api/auth/login`, {
@@ -171,32 +205,30 @@
                 
                 if (res.ok) {
                     const data = await res.json();
-                    if (data.role !== 'admin') {
-                        document.getElementById('loginError').textContent = '仅管理员可登录';
-                        document.getElementById('loginError').style.display = 'block';
-                        return;
-                    }
                     localStorage.setItem('token', data.token);
                     currentUser = data;
                     document.getElementById('loginModal').classList.remove('active');
-                    loadStats();
-                    loadUsers();
-                    loadPosts();
-                    loadBoards();
+                    document.getElementById('adminInfo').textContent = `👤 ${data.nickname}`;
+                    init();
                 } else {
                     const data = await res.json();
-                    document.getElementById('loginError').textContent = data.error || '登录失败';
-                    document.getElementById('loginError').style.display = 'block';
+                    showToast(data.error || '登录失败', true);
                 }
             } catch (e) {
-                alert('登录失败');
+                showToast('登录失败', true);
             }
+        }
+
+        async function init() {
+            await loadStats();
+            await loadUsers();
+            await loadPosts();
+            await loadBoards();
         }
 
         function switchTab(tab) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).classList.add('active');
-            
+            event.target.classList.add('active');
             document.getElementById('usersTab').style.display = tab === 'users' ? 'block' : 'none';
             document.getElementById('postsTab').style.display = tab === 'posts' ? 'block' : 'none';
             document.getElementById('boardsTab').style.display = tab === 'boards' ? 'block' : 'none';
@@ -204,29 +236,96 @@
 
         async function loadStats() {
             try {
-                const [usersRes, postsRes, boardsRes] = await Promise.all([
-                    fetch(`${API}/api/auth/me`),
-                    fetch(`${API}/api/posts?size=1`),
-                    fetch(`${API}/api/boards`)
-                ]);
+                const res = await fetch(`${API}/api/admin/stats`);
+                const stats = await res.json();
                 
-                const postsData = await postsRes.json();
-                const boards = await boardsRes.json();
-                
-                // 获取所有用户
-                // 简化处理，显示帖子数
-                document.getElementById('postCount').textContent = postsData.totalElements || 0;
-                document.getElementById('boardCount').textContent = boards.length || 0;
-                document.getElementById('userCount').textContent = '-';
-                document.getElementById('commentCount').textContent = '-';
+                document.getElementById('userCount').textContent = stats.userCount || 0;
+                document.getElementById('postCount').textContent = stats.postCount || 0;
+                document.getElementById('commentCount').textContent = stats.commentCount || 0;
+                document.getElementById('boardCount').textContent = stats.boardCount || 0;
             } catch (e) {
                 console.error(e);
             }
         }
 
         async function loadUsers() {
-            // 简化处理
-            document.getElementById('usersList').innerHTML = '<tr><td colspan="7">用户列表需完善</td></tr>';
+            try {
+                const res = await fetch(`${API}/api/admin/users`);
+                const users = await res.json();
+                
+                document.getElementById('usersList').innerHTML = users.map(user => `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${user.username}</td>
+                        <td>${user.nickname || '-'}</td>
+                        <td>${user.email || '-'}</td>
+                        <td><span class="tag ${user.role === 'admin' ? 'tag-admin' : 'tag-user'}">${user.role}</span></td>
+                        <td>${user.enabled ? '✅ 正常' : '❌ 禁用'}</td>
+                        <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+                        <td>
+                            <button class="btn btn-sm ${user.role === 'admin' ? 'btn-warning' : 'btn-success'}" onclick="toggleRole(${user.id}, '${user.role}')">
+                                ${user.role === 'admin' ? '取消管理员' : '设为管理员'}
+                            </button>
+                            <button class="btn btn-sm ${user.enabled ? 'btn-danger' : 'btn-success'}" onclick="toggleUserStatus(${user.id}, ${user.enabled})" style="margin-left:0.3rem;">
+                                ${user.enabled ? '禁用' : '启用'}
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+                document.getElementById('usersList').innerHTML = '<tr><td colspan="8">加载失败</td></tr>';
+            }
+        }
+
+        async function toggleRole(userId, currentRole) {
+            const newRole = currentRole === 'admin' ? 'user' : 'admin';
+            if (!confirm(`确定将用户设为${newRole === 'admin' ? '管理员' : '普通用户'}吗?`)) return;
+            
+            try {
+                const res = await fetch(`${API}/api/admin/users/${userId}/role`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ role: newRole })
+                });
+                
+                if (res.ok) {
+                    showToast('修改成功');
+                    loadUsers();
+                } else {
+                    showToast('修改失败', true);
+                }
+            } catch (e) {
+                showToast('修改失败', true);
+            }
+        }
+
+        async function toggleUserStatus(userId, currentEnabled) {
+            const newStatus = currentEnabled ? 'disabled' : 'enabled';
+            if (!confirm(`确定${currentEnabled ? '禁用' : '启用'}此用户吗?`)) return;
+            
+            try {
+                const res = await fetch(`${API}/api/admin/users/${userId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                
+                if (res.ok) {
+                    showToast('修改成功');
+                    loadUsers();
+                } else {
+                    showToast('修改失败', true);
+                }
+            } catch (e) {
+                showToast('修改失败', true);
+            }
         }
 
         async function loadPosts() {
@@ -237,18 +336,61 @@
                 document.getElementById('postsList').innerHTML = data.content.map(post => `
                     <tr>
                         <td>${post.id}</td>
-                        <td>${post.title.substring(0, 20)}${post.title.length > 20 ? '...' : ''}</td>
+                        <td>${post.isPinned ? '<span class="pinned">📌 </span>' : ''}${post.title.substring(0, 25)}${post.title.length > 25 ? '...' : ''}</td>
                         <td>${post.nickname}</td>
                         <td>${post.board}</td>
                         <td>${post.likesCount}</td>
+                        <td>${post.isPinned ? '<span class="tag tag-admin">已置顶</span>' : '正常'}</td>
                         <td>${new Date(post.createdAt).toLocaleDateString()}</td>
                         <td>
-                            <button class="btn btn-danger" onclick="deletePost(${post.id})">删除</button>
+                            <button class="btn btn-sm ${post.isPinned ? 'btn-warning' : 'btn-success'}" onclick="togglePin(${post.id}, ${post.isPinned})">
+                                ${post.isPinned ? '取消置顶' : '置顶'}
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deletePost(${post.id})" style="margin-left:0.3rem;">删除</button>
                         </td>
                     </tr>
                 `).join('');
             } catch (e) {
                 console.error(e);
+            }
+        }
+
+        async function togglePin(postId, currentPinned) {
+            try {
+                const res = await fetch(`${API}/api/admin/posts/${postId}/pin`, {
+                    method: 'PUT',
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+                
+                if (res.ok) {
+                    showToast(currentPinned ? '已取消置顶' : '已置顶');
+                    loadPosts();
+                } else {
+                    showToast('操作失败', true);
+                }
+            } catch (e) {
+                showToast('操作失败', true);
+            }
+        }
+
+        async function deletePost(id) {
+            if (!confirm('确定删除此帖子?')) return;
+            
+            try {
+                const res = await fetch(`${API}/api/admin/posts/${id}`, {
+                    method: 'DELETE',
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+                
+                if (res.ok) {
+                    showToast('删除成功');
+                    loadPosts();
+                    loadStats();
+                } else {
+                    showToast('删除失败', true);
+                }
+            } catch (e) {
+                showToast('删除失败', true);
             }
         }
 
@@ -263,6 +405,9 @@
                         <td>${board.name}</td>
                         <td>${board.description || ''}</td>
                         <td>${new Date(board.createdAt).toLocaleDateString()}</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger" onclick="deleteBoard(${board.id})">删除</button>
+                        </td>
                     </tr>
                 `).join('');
             } catch (e) {
@@ -270,26 +415,11 @@
             }
         }
 
-        async function deletePost(id) {
-            if (!confirm('确定删除此帖子?')) return;
-            
-            try {
-                const res = await fetch(`${API}/api/posts/${id}`, {
-                    method: 'DELETE',
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                });
-                
-                if (res.ok) {
-                    loadPosts();
-                } else {
-                    alert('删除失败');
-                }
-            } catch (e) {
-                alert('删除失败');
-            }
-        }
-
         function showBoardModal() {
+            editingBoardId = null;
+            document.getElementById('boardModalTitle').textContent = '添加板块';
+            document.getElementById('boardName').value = '';
+            document.getElementById('boardDesc').value = '';
             document.getElementById('boardModal').classList.add('active');
         }
 
@@ -297,11 +427,11 @@
             document.getElementById(id).classList.remove('active');
         }
 
-        async function createBoard() {
-            const name = document.getElementById('boardName').value;
-            const description = document.getElementById('boardDesc').value;
+        async function saveBoard() {
+            const name = document.getElementById('boardName').value.trim();
+            const description = document.getElementById('boardDesc').value.trim();
             
-            if (!name) return alert('请输入板块名称');
+            if (!name) return showToast('请输入板块名称', true);
             
             try {
                 const res = await fetch(`${API}/api/boards`, {
@@ -314,14 +444,55 @@
                 });
                 
                 if (res.ok) {
+                    showToast('保存成功');
                     closeModal('boardModal');
                     loadBoards();
+                    loadStats();
                 } else {
-                    alert('创建失败');
+                    const data = await res.json();
+                    showToast(data.error || '保存失败', true);
                 }
             } catch (e) {
-                alert('创建失败');
+                showToast('保存失败', true);
             }
+        }
+
+        async function deleteBoard(id) {
+            if (!confirm('确定删除此板块吗?')) return;
+            
+            try {
+                const res = await fetch(`${API}/api/boards/${id}`, {
+                    method: 'DELETE',
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+                
+                if (res.ok) {
+                    showToast('删除成功');
+                    loadBoards();
+                    loadStats();
+                } else {
+                    showToast('删除失败', true);
+                }
+            } catch (e) {
+                showToast('删除失败', true);
+            }
+        }
+
+        // 检查登录状态
+        const token = localStorage.getItem('token');
+        if (token) {
+            fetch(`${API}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
+                .then(res => {
+                    if (res.ok) return res.json();
+                    throw new Error();
+                })
+                .then(user => {
+                    currentUser = user;
+                    document.getElementById('loginModal').classList.remove('active');
+                    document.getElementById('adminInfo').textContent = `👤 ${user.nickname}`;
+                    init();
+                })
+                .catch(() => {});
         }
     </script>
 </body>

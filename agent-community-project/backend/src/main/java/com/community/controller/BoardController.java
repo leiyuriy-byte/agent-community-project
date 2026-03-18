@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/boards")
@@ -25,5 +26,12 @@ public class BoardController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Board> createBoard(@RequestBody Board board) {
         return ResponseEntity.ok(boardService.createBoard(board));
+    }
+    
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteBoard(@PathVariable Long id) {
+        boardService.deleteBoard(id);
+        return ResponseEntity.ok(Map.of("success", true));
     }
 }

@@ -2,7 +2,9 @@ package com.community.service;
 
 import com.community.dto.PostDTO;
 import com.community.model.Post;
+import com.community.model.PostLike;
 import com.community.model.User;
+import com.community.repository.PostLikeRepository;
 import com.community.repository.PostRepository;
 import com.community.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 public class PostService {
     
     private final PostRepository postRepository;
+    private final PostLikeRepository postLikeRepository;
     private final UserRepository userRepository;
     
     public Page<PostDTO> getAllPosts(int page, int size) {
@@ -97,13 +100,40 @@ public class PostService {
     }
     
     @Transactional
-    public void likePost(Long id) {
+    public void likePost(Long id, Long userId) {
         Post post = postRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("帖子不存在"));
         if (post.getIsDeleted()) {
             throw new RuntimeException("帖子不存在");
         }
-        postRepository.incrementLikes(id);
+        
+        // 检查是否已经点赞
+        if (postLikeRepository.existsByUserIdAndPostId(userId, id)) {
+            // 取消点赞
+            postLikeRepository.deleteByUserIdAndPostId(userId, id);
+            post.setLikesCount(Math.max(0, post.getLikesCount() - 1));
+        } else {
+            // 添加点赞
+            PostLike like = new PostLike();
+            like.setUserId(userId);
+            like.setPostId(id);
+            postLikeRepository.save(like);
+            post.setLikesCount(post.getLikesCount() + 1);
+        }
+        postRepository.save(post);
+    }
+    
+    public boolean isLikedByUser(Long postId, Long userId) {
+        return postLikeRepository.existsByUserIdAndPostId(userId, postId);
+    }
+    
+    public List<PostDTO> getLikedPostsByUser(Long userId) {
+        List<Long> postIds = postLikeRepository.findPostIdsByUserId(userId);
+        return postIds.stream()
+            .map(postRepository::findById)
+            .filter(opt -> opt.isPresent() && !opt.get().getIsDeleted())
+            .map(opt -> toDTO(opt.get()))
+            .collect(Collectors.toList());
     }
     
     public List<PostDTO> getPostsByUser(Long userId) {

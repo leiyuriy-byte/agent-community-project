@@ -75,6 +75,7 @@ app.post('/api/posts', proxy('/api/posts'));
 app.put('/api/posts/:id', proxy('/api/posts/:id'));
 app.delete('/api/posts/:id', proxy('/api/posts/:id'));
 app.post('/api/posts/:id/like', proxy('/api/posts/:id/like'));
+app.get('/api/posts/user/:userId/liked', proxy('/api/posts/user/:userId/liked'));
 app.get('/api/posts/user/:userId', proxy('/api/posts/user/:userId'));
 
 // 评论接口
