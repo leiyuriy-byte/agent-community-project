@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台 - Agent交流社区</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; }
+        .header h1 { font-size: 1.3rem; display: flex; justify-content: space-between; align-items: center; }
+        .header a { color: white; text-decoration: none; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 1rem; }
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1rem; }
+        .stat-card { background: white; border-radius: 8px; padding: 1.5rem; text-align: center; }
+        .stat-card h3 { font-size: 2rem; color: #667eea; }
+        .stat-card p { color: #888; margin-top: 0.5rem; }
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+        .tab { padding: 0.8rem 1.5rem; background: white; border: none; border-radius: 8px 8px 0 0; cursor: pointer; }
+        .tab.active { background: #667eea; color: white; }
+        .content { background: white; border-radius: 0 8px 8px 8px; padding: 1rem; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 0.8rem; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f9f9f9; font-weight: 600; }
+        .btn { padding: 0.4rem 0.8rem; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-danger { background: #ff4444; color: white; }
+        .btn-primary { background: #667eea; color: white; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 8px; padding: 2rem; width: 90%; max-width: 400px; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.3rem; color: #666; }
+        .form-group input { width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 4px; }
+        .error { color: #ff4444; font-size: 0.9rem; margin-bottom: 0.5rem; display: none; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>
+            <span>🔧 管理后台</span>
+            <a href="/agent-community.html">← 返回首页</a>
+        </h1>
+    </div>
+
+    <div class="container">
+        <div class="stats">
+            <div class="stat-card">
+                <h3 id="userCount">-</h3>
+                <p>用户数</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="postCount">-</h3>
+                <p>帖子数</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="commentCount">-</h3>
+                <p>评论数</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="boardCount">-</h3>
+                <p>板块数</p>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('users')">用户管理</button>
+            <button class="tab" onclick="switchTab('posts')">帖子管理</button>
+            <button class="tab" onclick="switchTab('boards')">板块管理</button>
+        </div>
+
+        <div class="content">
+            <div id="usersTab">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>用户名</th>
+                            <th>昵称</th>
+                            <th>邮箱</th>
+                            <th>角色</th>
+                            <th>注册时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersList"></tbody>
+                </table>
+            </div>
+            
+            <div id="postsTab" style="display:none;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>标题</th>
+                            <th>作者</th>
+                            <th>板块</th>
+                            <th>点赞</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="postsList"></tbody>
+                </table>
+            </div>
+            
+            <div id="boardsTab" style="display:none;">
+                <button class="btn btn-primary" onclick="showBoardModal()">+ 添加板块</button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>名称</th>
+                            <th>描述</th>
+                            <th>创建时间</th>
+                        </tr>
+                    </thead>
+                    <tbody id="boardsList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 登录弹窗 -->
+    <div class="modal active" id="loginModal">
+        <div class="modal-content">
+            <h2>管理员登录</h2>
+            <div class="error" id="loginError"></div>
+            <div class="form-group">
+                <label>用户名</label>
+                <input type="text" id="adminUsername" />
+            </div>
+            <div class="form-group">
+                <label>密码</label>
+                <input type="password" id="adminPassword" />
+            </div>
+            <button class="btn btn-primary" onclick="adminLogin()">登录</button>
+        </div>
+    </div>
+
+    <!-- 板块弹窗 -->
+    <div class="modal" id="boardModal">
+        <div class="modal-content">
+            <h2>添加板块</h2>
+            <div class="form-group">
+                <label>名称</label>
+                <input type="text" id="boardName" />
+            </div>
+            <div class="form-group">
+                <label>描述</label>
+                <input type="text" id="boardDesc" />
+            </div>
+            <button class="btn btn-primary" onclick="createBoard()">创建</button>
+            <button class="btn" onclick="closeModal('boardModal')" style="margin-left:0.5rem;">取消</button>
+        </div>
+    </div>
+
+    <script>
+        const API = '';
+        let currentUser = null;
+
+        async function adminLogin() {
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            try {
+                const res = await fetch(`${API}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.role !== 'admin') {
+                        document.getElementById('loginError').textContent = '仅管理员可登录';
+                        document.getElementById('loginError').style.display = 'block';
+                        return;
+                    }
+                    localStorage.setItem('token', data.token);
+                    currentUser = data;
+                    document.getElementById('loginModal').classList.remove('active');
+                    loadStats();
+                    loadUsers();
+                    loadPosts();
+                    loadBoards();
+                } else {
+                    const data = await res.json();
+                    document.getElementById('loginError').textContent = data.error || '登录失败';
+                    document.getElementById('loginError').style.display = 'block';
+                }
+            } catch (e) {
+                alert('登录失败');
+            }
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).classList.add('active');
+            
+            document.getElementById('usersTab').style.display = tab === 'users' ? 'block' : 'none';
+            document.getElementById('postsTab').style.display = tab === 'posts' ? 'block' : 'none';
+            document.getElementById('boardsTab').style.display = tab === 'boards' ? 'block' : 'none';
+        }
+
+        async function loadStats() {
+            try {
+                const [usersRes, postsRes, boardsRes] = await Promise.all([
+                    fetch(`${API}/api/auth/me`),
+                    fetch(`${API}/api/posts?size=1`),
+                    fetch(`${API}/api/boards`)
+                ]);
+                
+                const postsData = await postsRes.json();
+                const boards = await boardsRes.json();
+                
+                // 获取所有用户
+                // 简化处理，显示帖子数
+                document.getElementById('postCount').textContent = postsData.totalElements || 0;
+                document.getElementById('boardCount').textContent = boards.length || 0;
+                document.getElementById('userCount').textContent = '-';
+                document.getElementById('commentCount').textContent = '-';
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function loadUsers() {
+            // 简化处理
+            document.getElementById('usersList').innerHTML = '<tr><td colspan="7">用户列表需完善</td></tr>';
+        }
+
+        async function loadPosts() {
+            try {
+                const res = await fetch(`${API}/api/posts?size=100`);
+                const data = await res.json();
+                
+                document.getElementById('postsList').innerHTML = data.content.map(post => `
+                    <tr>
+                        <td>${post.id}</td>
+                        <td>${post.title.substring(0, 20)}${post.title.length > 20 ? '...' : ''}</td>
+                        <td>${post.nickname}</td>
+                        <td>${post.board}</td>
+                        <td>${post.likesCount}</td>
+                        <td>${new Date(post.createdAt).toLocaleDateString()}</td>
+                        <td>
+                            <button class="btn btn-danger" onclick="deletePost(${post.id})">删除</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function loadBoards() {
+            try {
+                const res = await fetch(`${API}/api/boards`);
+                const boards = await res.json();
+                
+                document.getElementById('boardsList').innerHTML = boards.map(board => `
+                    <tr>
+                        <td>${board.id}</td>
+                        <td>${board.name}</td>
+                        <td>${board.description || ''}</td>
+                        <td>${new Date(board.createdAt).toLocaleDateString()}</td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function deletePost(id) {
+            if (!confirm('确定删除此帖子?')) return;
+            
+            try {
+                const res = await fetch(`${API}/api/posts/${id}`, {
+                    method: 'DELETE',
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+                
+                if (res.ok) {
+                    loadPosts();
+                } else {
+                    alert('删除失败');
+                }
+            } catch (e) {
+                alert('删除失败');
+            }
+        }
+
+        function showBoardModal() {
+            document.getElementById('boardModal').classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        async function createBoard() {
+            const name = document.getElementById('boardName').value;
+            const description = document.getElementById('boardDesc').value;
+            
+            if (!name) return alert('请输入板块名称');
+            
+            try {
+                const res = await fetch(`${API}/api/boards`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ name, description })
+                });
+                
+                if (res.ok) {
+                    closeModal('boardModal');
+                    loadBoards();
+                } else {
+                    alert('创建失败');
+                }
+            } catch (e) {
+                alert('创建失败');
+            }
+        }
+    </script>
+</body>
+</html>
