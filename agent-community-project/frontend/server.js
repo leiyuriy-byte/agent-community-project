@@ -100,6 +100,12 @@ app.post('/api/admin/boards', proxy('/api/admin/boards'));
 app.delete('/api/admin/boards/:id', proxy('/api/admin/boards/:id'));
 app.get('/api/admin/hot-posts', proxy('/api/admin/hot-posts'));
 
+// 通知接口
+app.get('/api/notifications', proxy('/api/notifications'));
+app.get('/api/notifications/unread-count', proxy('/api/notifications/unread-count'));
+app.put('/api/notifications/:id/read', proxy('/api/notifications/:id/read'));
+app.put('/api/notifications/read-all', proxy('/api/notifications/read-all'));
+
 // 静态页面路由
 app.get('/agent-community.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/agent-community.html'));

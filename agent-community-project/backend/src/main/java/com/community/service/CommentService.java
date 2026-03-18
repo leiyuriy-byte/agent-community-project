@@ -20,6 +20,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
     
     public List<Comment> getCommentsByPostId(Long postId) {
         return commentRepository.findByPostIdOrderByCreatedAtDesc(postId);
@@ -36,7 +37,24 @@ public class CommentService {
         comment.setUserId(userId);
         comment.setContent(content);
         
-        return commentRepository.save(comment);
+        Comment saved = commentRepository.save(comment);
+        
+        // 发送通知给帖子作者
+        postRepository.findById(postId).ifPresent(post -> {
+            if (!post.getUserId().equals(userId)) {
+                User commenter = userRepository.findById(userId).orElse(null);
+                if (commenter != null) {
+                    notificationService.createNotification(
+                        post.getUserId(),
+                        "comment",
+                        commenter.getNickname() + " 评论了你的帖子",
+                        postId
+                    );
+                }
+            }
+        });
+        
+        return saved;
     }
     
     public List<Comment> getCommentsByUser(Long userId) {

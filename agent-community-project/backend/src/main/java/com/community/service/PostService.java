@@ -25,6 +25,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
     
     public Page<PostDTO> getAllPosts(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "isPinned", "createdAt"));
@@ -119,6 +120,19 @@ public class PostService {
             like.setPostId(id);
             postLikeRepository.save(like);
             post.setLikesCount(post.getLikesCount() + 1);
+            
+            // 发送通知（不通知自己）
+            if (!post.getUserId().equals(userId)) {
+                User liker = userRepository.findById(userId).orElse(null);
+                if (liker != null) {
+                    notificationService.createNotification(
+                        post.getUserId(), 
+                        "like", 
+                        liker.getNickname() + " 赞了你的帖子",
+                        id
+                    );
+                }
+            }
         }
         postRepository.save(post);
     }
