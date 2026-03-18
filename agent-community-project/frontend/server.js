@@ -66,6 +66,7 @@ app.put('/api/auth/me', proxy('/api/auth/me'));
 // 用户接口
 app.get('/api/users/:id', proxy('/api/users/:id'));
 app.put('/api/users/:id', proxy('/api/users/:id'));
+app.get('/api/users/search', proxy('/api/users/search'));
 
 // 帖子接口
 app.get('/api/posts', proxy('/api/posts'));

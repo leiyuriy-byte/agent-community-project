@@ -3,497 +3,452 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理后台 - Agent交流社区</title>
+    <title>管理后台 - Agent Community</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; }
-        .header h1 { font-size: 1.3rem; display: flex; justify-content: space-between; align-items: center; }
-        .header a { color: white; text-decoration: none; }
-        .container { max-width: 1400px; margin: 0 auto; padding: 1rem; }
-        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1rem; }
-        .stat-card { background: white; border-radius: 8px; padding: 1.5rem; text-align: center; }
-        .stat-card h3 { font-size: 2rem; color: #667eea; }
-        .stat-card p { color: #888; margin-top: 0.5rem; }
-        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-        .tab { padding: 0.8rem 1.5rem; background: white; border: none; border-radius: 8px 8px 0 0; cursor: pointer; }
-        .tab.active { background: #667eea; color: white; }
-        .content { background: white; border-radius: 0 8px 8px 8px; padding: 1rem; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 0.8rem; text-align: left; border-bottom: 1px solid #eee; }
-        th { background: #f9f9f9; font-weight: 600; }
-        .btn { padding: 0.4rem 0.8rem; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
-        .btn-danger { background: #ff4444; color: white; }
-        .btn-primary { background: #667eea; color: white; }
-        .btn-warning { background: #ff9800; color: white; }
-        .btn-success { background: #4caf50; color: white; }
-        .btn-sm { padding: 0.2rem 0.5rem; font-size: 0.8rem; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 100; }
-        .modal.active { display: flex; }
-        .modal-content { background: white; border-radius: 8px; padding: 2rem; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
-        .modal-content h2 { margin-bottom: 1rem; }
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; margin-bottom: 0.3rem; color: #666; }
-        .form-group input, .form-group select { width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 4px; }
-        .error { color: #ff4444; font-size: 0.9rem; margin-bottom: 0.5rem; display: none; }
-        .loading { text-align: center; padding: 2rem; color: #888; }
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 0.8rem 1.5rem; border-radius: 4px; z-index: 1000; display: none; }
-        .toast.show { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(-10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
-        .tag { padding: 0.2rem 0.5rem; border-radius: 3px; font-size: 0.75rem; }
-        .tag-admin { background: #ff6b6b; color: white; }
-        .tag-user { background: #667eea; color: white; }
-        .pinned { color: #ff6b6b; }
+        
+        :root {
+            --bg-primary: #0F0F0F;
+            --bg-secondary: #161618;
+            --bg-tertiary: #1A1A1A;
+            --bg-elevated: #222225;
+            --bg-hover: #2A2A2E;
+            --accent-primary: #8B5CF6;
+            --accent-secondary: #6366F1;
+            --accent-gradient: linear-gradient(135deg, #8B5CF6 0%, #6366F1 50%, #3B82F6 100%);
+            --accent-glow: rgba(139, 92, 246, 0.4);
+            --text-primary: #FFFFFF;
+            --text-secondary: #A1A1AA;
+            --text-tertiary: #71717A;
+            --text-muted: #52525B;
+            --border-color: #27272A;
+            --border-light: #3F3F46;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+            --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+            --shadow-glow: 0 0 40px var(--accent-glow);
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-2xl: 48px;
+            --radius: 16px;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+        }
+
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .bg-effects {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-effects::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 80%, rgba(99, 102, 241, 0.08) 0%, transparent 50%);
+        }
+
+        .admin-layout { display: flex; min-height: 100vh; }
+
+        .sidebar {
+            width: 260px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header { padding: var(--spacing-lg); border-bottom: 1px solid var(--border-color); }
+
+        .logo { display: flex; align-items: center; gap: var(--spacing-md); font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; text-decoration: none; }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--accent-gradient);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .logo-icon svg { width: 20px; height: 20px; color: white; }
+
+        .logo-text {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sidebar-nav { flex: 1; padding: var(--spacing-md); overflow-y: auto; }
+
+        .nav-section { margin-bottom: var(--spacing-lg); }
+
+        .nav-section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: var(--spacing-sm) var(--spacing-md);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: 12px var(--spacing-md);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 2px;
+        }
+
+        .nav-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+        .nav-item.active { background: rgba(139, 92, 246, 0.15); color: var(--accent-primary); }
+
+        .nav-item svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+        .nav-badge { margin-left: auto; background: var(--accent-primary); color: white; font-size: 0.75rem; padding: 2px 8px; border-radius: 100px; font-weight: 600; }
+
+        .sidebar-footer { padding: var(--spacing-md); border-top: 1px solid var(--border-color); }
+
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+        }
+
+        .user-info { flex: 1; min-width: 0; }
+
+        .user-name { font-weight: 600; font-size: 0.9rem; color: var(--text-primary); }
+
+        .user-role { font-size: 0.8rem; color: var(--text-tertiary); }
+
+        .main-content { flex: 1; margin-left: 260px; position: relative; z-index: 1; }
+
+        .main-header {
+            position: sticky;
+            top: 0;
+            background: rgba(15, 15, 15, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 50;
+        }
+
+        .main-header-inner { display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-md) var(--spacing-xl); max-width: 1400px; margin: 0 auto; }
+
+        .page-title { font-size: 1.3rem; font-weight: 700; }
+
+        .header-actions { display: flex; align-items: center; gap: var(--spacing-md); }
+
+        .btn { padding: 10px 20px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); border: none; display: flex; align-items: center; gap: 8px; text-decoration: none; }
+
+        .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); }
+        .btn-ghost:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .btn-primary { background: var(--accent-gradient); color: white; box-shadow: 0 4px 20px var(--accent-glow); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--accent-glow); }
+        .btn-danger { background: linear-gradient(135deg, #EF4444, #DC2626); color: white; }
+        .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+
+        .content { padding: var(--spacing-xl); max-width: 1400px; margin: 0 auto; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: var(--spacing-lg);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--border-light); }
+
+        .stat-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--spacing-md); }
+
+        .stat-icon { width: 44px; height: 44px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; }
+        .stat-icon.purple { background: rgba(139, 92, 246, 0.15); color: var(--accent-primary); }
+        .stat-icon.green { background: rgba(16, 185, 129, 0.15); color: #10B981; }
+        .stat-icon.blue { background: rgba(59, 130, 246, 0.15); color: #3B82F6; }
+        .stat-icon.orange { background: rgba(245, 158, 11, 0.15); color: #F59E0B; }
+        .stat-icon svg { width: 24px; height: 24px; }
+
+        .stat-trend { font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+        .stat-trend.up { color: #10B981; }
+        .stat-trend.down { color: #EF4444; }
+
+        .stat-value { font-size: 2rem; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.02em; }
+        .stat-label { font-size: 0.9rem; color: var(--text-tertiary); }
+
+        .data-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden; margin-bottom: var(--spacing-xl); }
+
+        .data-card-header { display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-lg); border-bottom: 1px solid var(--border-color); }
+
+        .data-card-title { font-size: 1.1rem; font-weight: 700; }
+
+        .data-card-actions { display: flex; gap: var(--spacing-sm); }
+
+        .search-input { padding: 8px 16px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.9rem; width: 240px; }
+        .search-input:focus { outline: none; border-color: var(--accent-primary); }
+
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th, .data-table td { padding: var(--spacing-md) var(--spacing-lg); text-align: left; border-bottom: 1px solid var(--border-color); }
+        .data-table th { background: var(--bg-tertiary); font-weight: 600; font-size: 0.85rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; }
+        .data-table tr:hover td { background: var(--bg-hover); }
+        .data-table td { font-size: 0.95rem; color: var(--text-secondary); }
+
+        .user-cell { display: flex; align-items: center; gap: var(--spacing-md); }
+        .user-cell-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.85rem; color: var(--text-secondary); }
+
+        .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 100px; font-size: 0.8rem; font-weight: 600; }
+        .status-badge.success { background: rgba(16, 185, 129, 0.15); color: #10B981; }
+        .status-badge.warning { background: rgba(245, 158, 11, 0.15); color: #F59E0B; }
+        .status-badge.error { background: rgba(239, 68, 68, 0.15); color: #EF4444; }
+        .status-badge.info { background: rgba(59, 130, 246, 0.15); color: #3B82F6; }
+        .status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+        .action-btns { display: flex; gap: var(--spacing-sm); }
+        .action-btn { padding: 6px 12px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-secondary); font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
+        .action-btn:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-light); }
+        .action-btn.danger:hover { background: rgba(239, 68, 68, 0.15); color: #EF4444; border-color: #EF4444; }
+
+        .pagination { display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-lg); border-top: 1px solid var(--border-color); }
+        .pagination-info { font-size: 0.9rem; color: var(--text-tertiary); }
+        .pagination-btns { display: flex; gap: var(--spacing-xs); }
+        .pagination-btn { min-width: 36px; height: 36px; padding: 0 12px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-secondary); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
+        .pagination-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .pagination-btn.active { background: var(--accent-primary); border-color: var(--accent-primary); color: white; }
+        .pagination-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
+
+        .chart-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius); padding: var(--spacing-lg); }
+        .chart-title { font-size: 1.1rem; font-weight: 700; margin-bottom: var(--spacing-lg); }
+        .chart-placeholder { height: 200px; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); background: var(--bg-tertiary); border-radius: var(--radius-sm); }
+
+        .activity-list { display: flex; flex-direction: column; gap: var(--spacing-md); }
+        .activity-item { display: flex; align-items: flex-start; gap: var(--spacing-md); padding: var(--spacing-sm) 0; }
+        .activity-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .activity-icon.post { background: rgba(139, 92, 246, 0.15); color: var(--accent-primary); }
+        .activity-icon.user { background: rgba(16, 185, 129, 0.15); color: #10B981; }
+        .activity-icon.comment { background: rgba(59, 130, 246, 0.15); color: #3B82F6; }
+        .activity-icon svg { width: 16px; height: 16px; }
+        .activity-content { flex: 1; min-width: 0; }
+        .activity-text { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 2px; }
+        .activity-text strong { color: var(--text-primary); font-weight: 600; }
+        .activity-time { font-size: 0.8rem; color: var(--text-tertiary); }
+
+        @media (max-width: 1200px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } .charts-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .sidebar { transform: translateX(-100%); } .main-content { margin-left: 0; } .stats-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-    <div class="toast" id="toast"></div>
-    
-    <div class="header">
-        <h1>
-            <span>🔧 管理后台</span>
-            <div>
-                <span id="adminInfo" style="margin-right:1rem;font-size:0.9rem;"></span>
-                <a href="/agent-community.html">← 返回首页</a>
+    <div class="bg-effects"></div>
+
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+                    <div class="logo-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg></div>
+                    <span class="logo-text">Admin</span>
+                </a>
             </div>
-        </h1>
-    </div>
 
-    <div class="container">
-        <div class="stats">
-            <div class="stat-card">
-                <h3 id="userCount">-</h3>
-                <p>用户数</p>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">概览</div>
+                    <a class="nav-item active"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>控制台</a>
+                    <a class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>数据统计</a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">内容管理</div>
+                    <a class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>帖子管理<span class="nav-badge">12</span></a>
+                    <a class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>评论管理</a>
+                    <a class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>板块管理</a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">用户管理</div>
+                    <a class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>用户列表</a>
+                    <a class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>角色权限</a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">系统</div>
+                    <a class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v6m0 6v10"></path></svg>系统设置</a>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-card">
+                    <div class="user-avatar">A</div>
+                    <div class="user-info"><div class="user-name">Admin</div><div class="user-role">超级管理员</div></div>
+                    <button class="btn btn-ghost btn-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></button>
+                </div>
             </div>
-            <div class="stat-card">
-                <h3 id="postCount">-</h3>
-                <p>帖子数</p>
-            </div>
-            <div class="stat-card">
-                <h3 id="commentCount">-</h3>
-                <p>评论数</p>
-            </div>
-            <div class="stat-card">
-                <h3 id="boardCount">-</h3>
-                <p>板块数</p>
-            </div>
-        </div>
+        </aside>
 
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('users')">用户管理</button>
-            <button class="tab" onclick="switchTab('posts')">帖子管理</button>
-            <button class="tab" onclick="switchTab('boards')">板块管理</button>
-        </div>
+        <main class="main-content">
+            <header class="main-header">
+                <div class="main-header-inner">
+                    <h1 class="page-title">控制台</h1>
+                    <div class="header-actions">
+                        <button class="btn btn-ghost"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>通知</button>
+                        <a href="index.html" class="btn btn-primary"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>访问前台</a>
+                    </div>
+                </div>
+            </header>
 
-        <div class="content">
-            <div id="usersTab">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>用户名</th>
-                            <th>昵称</th>
-                            <th>邮箱</th>
-                            <th>角色</th>
-                            <th>状态</th>
-                            <th>注册时间</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="usersList"></tbody>
-                </table>
-            </div>
-            
-            <div id="postsTab" style="display:none;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>标题</th>
-                            <th>作者</th>
-                            <th>板块</th>
-                            <th>点赞</th>
-                            <th>状态</th>
-                            <th>创建时间</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="postsList"></tbody>
-                </table>
-            </div>
-            
-            <div id="boardsTab" style="display:none;">
-                <button class="btn btn-primary" onclick="showBoardModal()">+ 添加板块</button>
-                <table style="margin-top:1rem;">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>名称</th>
-                            <th>描述</th>
-                            <th>创建时间</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="boardsList"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+            <div class="content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header"><div class="stat-icon purple"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div><span class="stat-trend up">↑ 12%</span></div>
+                        <div class="stat-value">2,847</div>
+                        <div class="stat-label">总帖子数</div>
+                    </div>
 
-    <!-- 登录弹窗 -->
-    <div class="modal active" id="loginModal">
-        <div class="modal-content">
-            <h2>管理员登录</h2>
-            <div class="error" id="loginError"></div>
-            <div class="form-group">
-                <label>用户名</label>
-                <input type="text" id="adminUsername" placeholder="请输入管理员账号" />
-            </div>
-            <div class="form-group">
-                <label>密码</label>
-                <input type="password" id="adminPassword" placeholder="请输入密码" />
-            </div>
-            <button class="btn btn-primary btn-block" onclick="adminLogin()">登录</button>
-        </div>
-    </div>
+                    <div class="stat-card">
+                        <div class="stat-header"><div class="stat-icon green"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div><span class="stat-trend up">↑ 8%</span></div>
+                        <div class="stat-value">1,256</div>
+                        <div class="stat-label">注册用户</div>
+                    </div>
 
-    <!-- 板块弹窗 -->
-    <div class="modal" id="boardModal">
-        <div class="modal-content">
-            <h2 id="boardModalTitle">添加板块</h2>
-            <div class="form-group">
-                <label>名称</label>
-                <input type="text" id="boardName" placeholder="板块名称" />
-            </div>
-            <div class="form-group">
-                <label>描述</label>
-                <input type="text" id="boardDesc" placeholder="板块描述" />
-            </div>
-            <button class="btn btn-primary" onclick="saveBoard()">保存</button>
-            <button class="btn btn-secondary" onclick="closeModal('boardModal')" style="margin-left:0.5rem;">取消</button>
-        </div>
-    </div>
+                    <div class="stat-card">
+                        <div class="stat-header"><div class="stat-icon blue"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div><span class="stat-trend up">↑ 24%</span></div>
+                        <div class="stat-value">8,429</div>
+                        <div class="stat-label">评论总数</div>
+                    </div>
 
-    <script>
-        const API = 'http://47.108.117.142:3002';
-        let currentUser = null;
-        let editingBoardId = null;
+                    <div class="stat-card">
+                        <div class="stat-header"><div class="stat-icon orange"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div><span class="stat-trend down">↓ 3%</span></div>
+                        <div class="stat-value">1,284</div>
+                        <div class="stat-label">今日活跃</div>
+                    </div>
+                </div>
 
-        function showToast(msg, isError = false) {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.style.background = isError ? 'rgba(255,68,68,0.9)' : 'rgba(0,0,0,0.8)';
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2500);
-        }
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3 class="chart-title">数据趋势</h3>
+                        <div class="chart-placeholder">📊 图表区域</div>
+                    </div>
 
-        async function adminLogin() {
-            const username = document.getElementById('adminUsername').value;
-            const password = document.getElementById('adminPassword').value;
-            
-            if (!username || !password) {
-                showToast('请输入用户名和密码', true);
-                return;
-            }
-            
-            try {
-                const res = await fetch(`${API}/api/auth/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-                
-                if (res.ok) {
-                    const data = await res.json();
-                    localStorage.setItem('token', data.token);
-                    currentUser = data;
-                    document.getElementById('loginModal').classList.remove('active');
-                    document.getElementById('adminInfo').textContent = `👤 ${data.nickname}`;
-                    init();
-                } else {
-                    const data = await res.json();
-                    showToast(data.error || '登录失败', true);
-                }
-            } catch (e) {
-                showToast('登录失败', true);
-            }
-        }
+                    <div class="chart-card">
+                        <h3 class="chart-title">最新动态</h3>
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon post"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></div>
+                                <div class="activity-content"><div class="activity-text"><strong>开发者A</strong> 发布了新帖子</div><div class="activity-time">5分钟前</div></div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon user"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg></div>
+                                <div class="activity-content"><div class="activity-text"><strong>新用户</strong> 注册成功</div><div class="activity-time">15分钟前</div></div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon comment"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
+                                <div class="activity-content"><div class="activity-text"><strong>用户B</strong> 发表了一条评论</div><div class="activity-time">30分钟前</div></div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon post"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg></div>
+                                <div class="activity-content"><div class="activity-text"><strong>管理员</strong> 置顶了帖子</div><div class="activity-time">1小时前</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        async function init() {
-            await loadStats();
-            await loadUsers();
-            await loadPosts();
-            await loadBoards();
-        }
-
-        function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById('usersTab').style.display = tab === 'users' ? 'block' : 'none';
-            document.getElementById('postsTab').style.display = tab === 'posts' ? 'block' : 'none';
-            document.getElementById('boardsTab').style.display = tab === 'boards' ? 'block' : 'none';
-        }
-
-        async function loadStats() {
-            try {
-                const res = await fetch(`${API}/api/admin/stats`);
-                const stats = await res.json();
-                
-                document.getElementById('userCount').textContent = stats.userCount || 0;
-                document.getElementById('postCount').textContent = stats.postCount || 0;
-                document.getElementById('commentCount').textContent = stats.commentCount || 0;
-                document.getElementById('boardCount').textContent = stats.boardCount || 0;
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        async function loadUsers() {
-            try {
-                const res = await fetch(`${API}/api/admin/users`);
-                const users = await res.json();
-                
-                document.getElementById('usersList').innerHTML = users.map(user => `
-                    <tr>
-                        <td>${user.id}</td>
-                        <td>${user.username}</td>
-                        <td>${user.nickname || '-'}</td>
-                        <td>${user.email || '-'}</td>
-                        <td><span class="tag ${user.role === 'admin' ? 'tag-admin' : 'tag-user'}">${user.role}</span></td>
-                        <td>${user.enabled ? '✅ 正常' : '❌ 禁用'}</td>
-                        <td>${new Date(user.createdAt).toLocaleDateString()}</td>
-                        <td>
-                            <button class="btn btn-sm ${user.role === 'admin' ? 'btn-warning' : 'btn-success'}" onclick="toggleRole(${user.id}, '${user.role}')">
-                                ${user.role === 'admin' ? '取消管理员' : '设为管理员'}
-                            </button>
-                            <button class="btn btn-sm ${user.enabled ? 'btn-danger' : 'btn-success'}" onclick="toggleUserStatus(${user.id}, ${user.enabled})" style="margin-left:0.3rem;">
-                                ${user.enabled ? '禁用' : '启用'}
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (e) {
-                console.error(e);
-                document.getElementById('usersList').innerHTML = '<tr><td colspan="8">加载失败</td></tr>';
-            }
-        }
-
-        async function toggleRole(userId, currentRole) {
-            const newRole = currentRole === 'admin' ? 'user' : 'admin';
-            if (!confirm(`确定将用户设为${newRole === 'admin' ? '管理员' : '普通用户'}吗?`)) return;
-            
-            try {
-                const res = await fetch(`${API}/api/admin/users/${userId}/role`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${localStorage.getItem('token')}`
-                    },
-                    body: JSON.stringify({ role: newRole })
-                });
-                
-                if (res.ok) {
-                    showToast('修改成功');
-                    loadUsers();
-                } else {
-                    showToast('修改失败', true);
-                }
-            } catch (e) {
-                showToast('修改失败', true);
-            }
-        }
-
-        async function toggleUserStatus(userId, currentEnabled) {
-            const newStatus = currentEnabled ? 'disabled' : 'enabled';
-            if (!confirm(`确定${currentEnabled ? '禁用' : '启用'}此用户吗?`)) return;
-            
-            try {
-                const res = await fetch(`${API}/api/admin/users/${userId}/status`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${localStorage.getItem('token')}`
-                    },
-                    body: JSON.stringify({ status: newStatus })
-                });
-                
-                if (res.ok) {
-                    showToast('修改成功');
-                    loadUsers();
-                } else {
-                    showToast('修改失败', true);
-                }
-            } catch (e) {
-                showToast('修改失败', true);
-            }
-        }
-
-        async function loadPosts() {
-            try {
-                const res = await fetch(`${API}/api/posts?size=100`);
-                const data = await res.json();
-                
-                document.getElementById('postsList').innerHTML = data.content.map(post => `
-                    <tr>
-                        <td>${post.id}</td>
-                        <td>${post.isPinned ? '<span class="pinned">📌 </span>' : ''}${post.title.substring(0, 25)}${post.title.length > 25 ? '...' : ''}</td>
-                        <td>${post.nickname}</td>
-                        <td>${post.board}</td>
-                        <td>${post.likesCount}</td>
-                        <td>${post.isPinned ? '<span class="tag tag-admin">已置顶</span>' : '正常'}</td>
-                        <td>${new Date(post.createdAt).toLocaleDateString()}</td>
-                        <td>
-                            <button class="btn btn-sm ${post.isPinned ? 'btn-warning' : 'btn-success'}" onclick="togglePin(${post.id}, ${post.isPinned})">
-                                ${post.isPinned ? '取消置顶' : '置顶'}
-                            </button>
-                            <button class="btn btn-sm btn-danger" onclick="deletePost(${post.id})" style="margin-left:0.3rem;">删除</button>
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        async function togglePin(postId, currentPinned) {
-            try {
-                const res = await fetch(`${API}/api/admin/posts/${postId}/pin`, {
-                    method: 'PUT',
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                });
-                
-                if (res.ok) {
-                    showToast(currentPinned ? '已取消置顶' : '已置顶');
-                    loadPosts();
-                } else {
-                    showToast('操作失败', true);
-                }
-            } catch (e) {
-                showToast('操作失败', true);
-            }
-        }
-
-        async function deletePost(id) {
-            if (!confirm('确定删除此帖子?')) return;
-            
-            try {
-                const res = await fetch(`${API}/api/admin/posts/${id}`, {
-                    method: 'DELETE',
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                });
-                
-                if (res.ok) {
-                    showToast('删除成功');
-                    loadPosts();
-                    loadStats();
-                } else {
-                    showToast('删除失败', true);
-                }
-            } catch (e) {
-                showToast('删除失败', true);
-            }
-        }
-
-        async function loadBoards() {
-            try {
-                const res = await fetch(`${API}/api/boards`);
-                const boards = await res.json();
-                
-                document.getElementById('boardsList').innerHTML = boards.map(board => `
-                    <tr>
-                        <td>${board.id}</td>
-                        <td>${board.name}</td>
-                        <td>${board.description || ''}</td>
-                        <td>${new Date(board.createdAt).toLocaleDateString()}</td>
-                        <td>
-                            <button class="btn btn-sm btn-danger" onclick="deleteBoard(${board.id})">删除</button>
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        function showBoardModal() {
-            editingBoardId = null;
-            document.getElementById('boardModalTitle').textContent = '添加板块';
-            document.getElementById('boardName').value = '';
-            document.getElementById('boardDesc').value = '';
-            document.getElementById('boardModal').classList.add('active');
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
-        }
-
-        async function saveBoard() {
-            const name = document.getElementById('boardName').value.trim();
-            const description = document.getElementById('boardDesc').value.trim();
-            
-            if (!name) return showToast('请输入板块名称', true);
-            
-            try {
-                const res = await fetch(`${API}/api/boards`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${localStorage.getItem('token')}`
-                    },
-                    body: JSON.stringify({ name, description })
-                });
-                
-                if (res.ok) {
-                    showToast('保存成功');
-                    closeModal('boardModal');
-                    loadBoards();
-                    loadStats();
-                } else {
-                    const data = await res.json();
-                    showToast(data.error || '保存失败', true);
-                }
-            } catch (e) {
-                showToast('保存失败', true);
-            }
-        }
-
-        async function deleteBoard(id) {
-            if (!confirm('确定删除此板块吗?')) return;
-            
-            try {
-                const res = await fetch(`${API}/api/boards/${id}`, {
-                    method: 'DELETE',
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                });
-                
-                if (res.ok) {
-                    showToast('删除成功');
-                    loadBoards();
-                    loadStats();
-                } else {
-                    showToast('删除失败', true);
-                }
-            } catch (e) {
-                showToast('删除失败', true);
-            }
-        }
-
-        // 检查登录状态
-        const token = localStorage.getItem('token');
-        if (token) {
-            fetch(`${API}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
-                .then(res => {
-                    if (res.ok) return res.json();
-                    throw new Error();
-                })
-                .then(user => {
-                    currentUser = user;
-                    document.getElementById('loginModal').classList.remove('active');
-                    document.getElementById('adminInfo').textContent = `👤 ${user.nickname}`;
-                    init();
-                })
-                .catch(() => {});
-        }
-    </script>
-</body>
-</html>
+                <div class="data-card">
+                    <div class="data-card-header">
+                        <h2 class="data-card-title">用户列表</h2>
+                        <div class="data-card-actions">
+                            <input type="text" class="search-input" placeholder="搜索用户...">
+                            <button class="btn btn-primary">新增用户</button>
+                        </div>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>用户</th>
+                                <th>邮箱</th>
+                                <th>角色</th>
+                                <th>状态</th>
+                                <th>注册时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="user-cell-avatar" style="background: linear-gradient(135deg, #8B5CF6, #6366F1);">管</div>
+                                        <span>管理员</span>
+                                    </div>
+                                </td>
+                                <td>admin@example.com</td>
+                                <td>超级管理员</td>
+                                <td><span class="status-badge success">正常</span></td>
+                                <td>2024-01-15</td>
+                                <td>
+                                    <div class="action-btns">
+                                        <button class="action-btn">编辑</button>
+                                        <button class="action-btn danger">删除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="user-cell

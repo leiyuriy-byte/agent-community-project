@@ -26,6 +26,7 @@ public class PostService {
     private final PostLikeRepository postLikeRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final MentionService mentionService;
     
     public Page<PostDTO> getAllPosts(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "isPinned", "createdAt"));
@@ -57,6 +58,10 @@ public class PostService {
         post.setIsDeleted(false);
         
         post = postRepository.save(post);
+        
+        // 处理@提及通知
+        mentionService.handlePostMentions(post.getId(), post.getTitle(), userId, post.getContent());
+        
         return toDTO(post);
     }
     

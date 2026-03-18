@@ -3,49 +3,586 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人中心 - Agent交流社区</title>
+    <title>个人中心 - Agent Community</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* ===== 基础重置 ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { font-size: 1.3rem; }
-        .header a { color: white; text-decoration: none; margin-left: 1rem; cursor: pointer; }
-        .container { max-width: 900px; margin: 0 auto; padding: 1rem; }
-        .profile-card { background: white; border-radius: 8px; padding: 2rem; margin-bottom: 1rem; }
-        .profile-header { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem; }
-        .avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: bold; }
-        .profile-info h2 { font-size: 1.5rem; color: #333; }
-        .profile-info p { color: #888; margin-top: 0.3rem; }
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; margin-bottom: 0.3rem; color: #666; }
-        .form-group input { width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; }
-        .btn { padding: 0.6rem 1.2rem; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; }
-        .btn-primary { background: #667eea; color: white; }
-        .btn-danger { background: #ff4444; color: white; }
-        .btn-secondary { background: #999; color: white; }
-        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-        .tab { padding: 0.8rem 1.5rem; background: white; border: none; border-radius: 8px 8px 0 0; cursor: pointer; }
-        .tab.active { background: #667eea; color: white; }
-        .content { background: white; border-radius: 0 8px 8px 8px; padding: 1rem; }
-        .post-card { border: 1px solid #eee; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; cursor: pointer; }
-        .post-card:hover { background: #f9f9f9; }
-        .post-title { font-size: 1.1rem; font-weight: 600; color: #333; margin-bottom: 0.5rem; }
-        .post-meta { font-size: 0.85rem; color: #888; }
-        .error { color: #ff4444; font-size: 0.9rem; margin-bottom: 0.5rem; display: none; }
-        .success { color: #4caf50; font-size: 0.9rem; margin-bottom: 0.5rem; display: none; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
-        .modal.active { display: flex; }
-        .modal-content { background: white; border-radius: 8px; padding: 2rem; width: 90%; max-width: 400px; }
+        
+        :root {
+            /* Linear/Vercel 风格深色主题 */
+            --bg-primary: #0F0F0F;
+            --bg-secondary: #161618;
+            --bg-tertiary: #1A1A1A;
+            --bg-elevated: #222225;
+            --bg-hover: #2A2A2E;
+            
+            /* 强调色 - 紫色渐变 */
+            --accent-primary: #8B5CF6;
+            --accent-secondary: #6366F1;
+            --accent-gradient: linear-gradient(135deg, #8B5CF6 0%, #6366F1 50%, #3B82F6 100%);
+            --accent-glow: rgba(139, 92, 246, 0.4);
+            
+            /* 文字颜色 */
+            --text-primary: #FFFFFF;
+            --text-secondary: #A1A1AA;
+            --text-tertiary: #71717A;
+            --text-muted: #52525B;
+            
+            /* 边框 */
+            --border-color: #27272A;
+            --border-light: #3F3F46;
+            
+            /* 阴影 */
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+            --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+            --shadow-glow: 0 0 40px var(--accent-glow);
+            
+            /* 间距 */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-2xl: 48px;
+            
+            /* 圆角 - 统一 16px */
+            --radius: 16px;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+        }
+
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ===== 背景效果 ===== */
+        .bg-effects {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-effects::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 60%);
+            animation: bgPulse 20s ease-in-out infinite;
+        }
+
+        @keyframes bgPulse {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(2%, 2%) rotate(1deg); }
+            66% { transform: translate(-1%, 1%) rotate(-1deg); }
+        }
+
+        /* ===== 头部导航 ===== */
+        .header { 
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(15, 15, 15, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 72px;
+            padding: 0 var(--spacing-lg);
+        }
+
+        .logo { 
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            font-size: 1.5rem; 
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-gradient);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .logo-icon svg {
+            width: 24px;
+            height: 24px;
+            color: white;
+        }
+
+        .logo-text {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-actions { 
+            display: flex; 
+            align-items: center; 
+            gap: var(--spacing-md);
+        }
+
+        .header-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .header-link:hover {
+            color: var(--text-primary);
+        }
+
+        .btn { 
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-ghost:hover { 
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: white;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        /* ===== 主容器 ===== */
+        .container { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            padding: var(--spacing-2xl) var(--spacing-lg);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== 用户信息卡片 ===== */
+        .profile-card { 
+            background: var(--bg-secondary); 
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius); 
+            padding: var(--spacing-xl); 
+            margin-bottom: var(--spacing-lg);
+            transition: all 0.3s ease;
+        }
+
+        .profile-card:hover {
+            border-color: var(--border-light);
+            box-shadow: var(--shadow-md);
+        }
+
+        .profile-header { 
+            display: flex; 
+            align-items: center; 
+            gap: var(--spacing-lg); 
+            margin-bottom: var(--spacing-lg); 
+        }
+
+        .avatar { 
+            width: 100px; 
+            height: 100px; 
+            border-radius: 50%; 
+            background: var(--accent-gradient); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: white; 
+            font-size: 2.5rem; 
+            font-weight: 700;
+            box-shadow: var(--shadow-glow);
+            flex-shrink: 0;
+        }
+
+        .profile-info { flex: 1; }
+
+        .profile-info h2 { 
+            font-size: 1.8rem; 
+            font-weight: 700; 
+            color: var(--text-primary); 
+            margin-bottom: var(--spacing-xs);
+            letter-spacing: -0.02em;
+        }
+
+        .profile-info p { 
+            color: var(--text-tertiary); 
+            font-size: 1rem;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: var(--spacing-xl);
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--border-color);
+            margin-top: var(--spacing-lg);
+        }
+
+        .profile-stat {
+            text-align: center;
+        }
+
+        .profile-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .profile-stat-label {
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+        }
+
+        /* ===== 标签切换 ===== */
+        .tabs { 
+            display: flex; 
+            gap: var(--spacing-sm); 
+            margin-bottom: var(--spacing-lg); 
+        }
+
+        .tab { 
+            padding: 12px 24px; 
+            background: var(--bg-secondary); 
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm); 
+            cursor: pointer; 
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.25s ease;
+        }
+
+        .tab:hover { 
+            background: var(--bg-hover); 
+            color: var(--text-primary);
+        }
+
+        .tab.active { 
+            background: var(--accent-primary); 
+            border-color: var(--accent-primary);
+            color: white;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        /* ===== 内容区域 ===== */
+        .content { 
+            background: var(--bg-secondary); 
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius); 
+            padding: var(--spacing-lg); 
+        }
+
+        /* ===== 帖子卡片 ===== */
+        .post-card { 
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm); 
+            padding: var(--spacing-lg); 
+            margin-bottom: var(--spacing-md); 
+            cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--bg-tertiary);
+        }
+
+        .post-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .post-card:hover { 
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--border-light);
+        }
+
+        .post-title { 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+            color: var(--text-primary); 
+            margin-bottom: var(--spacing-sm); 
+        }
+
+        .post-meta { 
+            font-size: 0.85rem; 
+            color: var(--text-tertiary); 
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-2xl);
+            color: var(--text-tertiary);
+        }
+
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: var(--spacing-md);
+            opacity: 0.5;
+        }
+
+        /* ===== 消息提示 ===== */
+        .error { 
+            color: #EF4444; 
+            font-size: 0.9rem; 
+            margin-bottom: var(--spacing-md); 
+            display: none;
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: var(--radius-sm);
+        }
+
+        .success { 
+            color: #10B981; 
+            font-size: 0.9rem; 
+            margin-bottom: var(--spacing-md); 
+            display: none;
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: var(--radius-sm);
+        }
+
+        /* ===== 弹窗 ===== */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            justify-content: center; 
+            align-items: center; 
+            z-index: 1000;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal.active { 
+            display: flex; 
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content { 
+            background: var(--bg-secondary); 
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius); 
+            padding: var(--spacing-xl); 
+            width: 90%; 
+            max-width: 420px;
+            box-shadow: var(--shadow-lg);
+            animation: modalSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes modalSlide {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .modal-header h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .form-group { margin-bottom: var(--spacing-md); }
+
+        .form-group label { 
+            display: block; 
+            margin-bottom: var(--spacing-sm); 
+            color: var(--text-secondary); 
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-group input { 
+            width: 100%; 
+            padding: 12px 16px; 
+            background: var(--bg-tertiary); 
+            border: 1px solid var(--border-color); 
+            border-radius: var(--radius-sm); 
+            font-size: 1rem; 
+            color: var(--text-primary);
+            transition: all 0.25s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus { 
+            outline: none; 
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-lg);
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 768px) {
+            .header-inner {
+                padding: 0 var(--spacing-md);
+            }
+
+            .logo-text {
+                display: none;
+            }
+
+            .container {
+                padding: var(--spacing-lg) var(--spacing-md);
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-stats {
+                justify-content: center;
+            }
+
+            .tabs {
+                overflow-x: auto;
+                padding-bottom: var(--spacing-sm);
+            }
+
+            .tab {
+                white-space: nowrap;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>👤 个人中心</h1>
-        <div>
-            <a href="/agent-community.html">首页</a>
-            <a onclick="logout()">退出登录</a>
+    <!-- 背景效果 -->
+    <div class="bg-effects"></div>
+
+    <!-- 头部导航 -->
+    <header class="header">
+        <div class="header-inner">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                        <polyline points="2 17 12 22 22 17"></polyline>
+                        <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                </div>
+                <span class="logo-text">Agent Community</span>
+            </a>
+            <div class="header-actions">
+                <a href="index.html" class="header-link">首页</a>
+                <a onclick="logout()" class="header-link">退出登录</a>
+            </div>
         </div>
-    </div>
+    </header>
 
     <div class="container">
         <!-- 用户信息 -->
@@ -57,41 +594,76 @@
                     <p id="username">@-</p>
                 </div>
             </div>
-            <button class="btn btn-primary" onclick="showEditModal()">编辑资料</button>
+            <div class="profile-stats">
+                <div class="profile-stat">
+                    <div class="profile-stat-value" id="postCount">0</div>
+                    <div class="profile-stat-label">帖子</div>
+                </div>
+                <div class="profile-stat">
+                    <div class="profile-stat-value" id="likeCount">0</div>
+                    <div class="profile-stat-label">获赞</div>
+                </div>
+                <div class="profile-stat">
+                    <div class="profile-stat-value" id="followersCount">0</div>
+                    <div class="profile-stat-label">粉丝</div>
+                </div>
+            </div>
+            <button class="btn btn-primary" style="margin-top: var(--spacing-lg);" onclick="showEditModal()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                编辑资料
+            </button>
         </div>
 
-        <!-- 我的帖子 -->
+        <!-- 标签切换 -->
         <div class="tabs">
             <button class="tab active" onclick="switchTab('posts')">我的帖子</button>
             <button class="tab" onclick="switchTab('liked')">我的点赞</button>
         </div>
 
+        <!-- 内容区域 -->
         <div class="content">
-            <div id="postsList"></div>
-            <div id="likedList" style="display:none;"></div>
+            <div id="postsList">
+                <div class="empty-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    <p>暂无帖子</p>
+                </div>
+            </div>
+            <div id="likedList" style="display:none;">
+                <div class="empty-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+                    <p>暂无点赞</p>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- 编辑资料弹窗 -->
     <div class="modal" id="editModal">
         <div class="modal-content">
-            <h2>编辑资料</h2>
+            <div class="modal-header">
+                <h2>编辑资料</h2>
+                <button class="modal-close" onclick="closeModal('editModal')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
             <div class="error" id="editError"></div>
             <div class="success" id="editSuccess"></div>
             <div class="form-group">
                 <label>昵称</label>
-                <input type="text" id="editNickname" />
+                <input type="text" id="editNickname" placeholder="请输入昵称" />
             </div>
             <div class="form-group">
                 <label>邮箱</label>
-                <input type="email" id="editEmail" />
+                <input type="email" id="editEmail" placeholder="请输入邮箱" />
             </div>
             <div class="form-group">
                 <label>新密码（不修改请留空）</label>
-                <input type="password" id="editPassword" />
+                <input type="password" id="editPassword" placeholder="请输入新密码" />
             </div>
-            <button class="btn btn-primary" onclick="saveProfile()">保存</button>
-            <button class="btn btn-secondary" onclick="closeModal('editModal')" style="margin-left: 0.5rem;">取消</button>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal('editModal')">取消</button>
+                <button class="btn btn-primary" onclick="saveProfile()">保存</button>
+            </div>
         </div>
     </div>
 
@@ -125,12 +697,18 @@
         }
 
         function renderProfile() {
-            document.getElementById('nickname').textContent = currentUser.nickname || currentUser.username;
+            const displayName = currentUser.nickname || currentUser.username;
+            document.getElementById('nickname').textContent = displayName;
             document.getElementById('username').textContent = '@' + currentUser.username;
-            document.getElementById('avatar').textContent = (currentUser.nickname || currentUser.username).charAt(0).toUpperCase();
+            document.getElementById('avatar').textContent = displayName.charAt(0).toUpperCase();
             
             document.getElementById('editNickname').value = currentUser.nickname || '';
             document.getElementById('editEmail').value = currentUser.email || '';
+            
+            // 临时统计数据
+            document.getElementById('postCount').textContent = '0';
+            document.getElementById('likeCount').textContent = '0';
+            document.getElementById('followersCount').textContent = '0';
         }
 
         async function loadMyPosts() {
@@ -142,15 +720,27 @@
                 const posts = await res.json();
                 
                 const list = document.getElementById('postsList');
-                if (posts.length === 0) {
-                    list.innerHTML = '<p style="color:#888;text-align:center;">暂无帖子</p>';
+                if (!posts || posts.length === 0) {
+                    list.innerHTML = `
+                        <div class="empty-state">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                            <p>暂无帖子</p>
+                        </div>`;
                     return;
                 }
+                
+                document.getElementById('postCount').textContent = posts.length;
                 
                 list.innerHTML = posts.map(post => `
                     <div class="post-card" onclick="location.href='/post.html?id=${post.id}'">
                         <div class="post-title">${post.isPinned ? '📌 ' : ''}${post.title}</div>
-                        <div class="post-meta">${post.board} · ${new Date(post.createdAt).toLocaleString()} · 👍 ${post.likesCount}</div>
+                        <div class="post-meta">
+                            <span>${post.board}</span>
+                            <span>·</span>
+                            <span>${new Date(post.createdAt).toLocaleString()}</span>
+                            <span>·</span>
+                            <span>👍 ${post.likesCount || 0}</span>
+                        </div>
                     </div>
                 `).join('');
             } catch (e) {
@@ -182,19 +772,34 @@
                 
                 const list = document.getElementById('likedList');
                 if (!posts || posts.length === 0) {
-                    list.innerHTML = '<p style="color:#888;text-align:center;">暂无点赞</p>';
+                    list.innerHTML = `
+                        <div class="empty-state">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+                            <p>暂无点赞</p>
+                        </div>`;
                     return;
                 }
+                
+                document.getElementById('likeCount').textContent = posts.length;
                 
                 list.innerHTML = posts.map(post => `
                     <div class="post-card" onclick="location.href='/post.html?id=${post.id}'">
                         <div class="post-title">👍 ${post.title}</div>
-                        <div class="post-meta">${post.nickname} · ${post.board} · ${new Date(post.createdAt).toLocaleString()}</div>
+                        <div class="post-meta">
+                            <span>${post.nickname || '匿名用户'}</span>
+                            <span>·</span>
+                            <span>${post.board}</span>
+                            <span>·</span>
+                            <span>${new Date(post.createdAt).toLocaleString()}</span>
+                        </div>
                     </div>
                 `).join('');
             } catch (e) {
                 console.error(e);
-                document.getElementById('likedList').innerHTML = '<p style="color:#888;text-align:center;">加载失败</p>';
+                document.getElementById('likedList').innerHTML = `
+                    <div class="empty-state">
+                        <p>加载失败</p>
+                    </div>`;
             }
         }
 
@@ -246,8 +851,26 @@
 
         function logout() {
             localStorage.removeItem('token');
-            location.href = '/agent-community.html';
+            location.href = '/index.html';
         }
+
+        // 点击弹窗外部关闭
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+
+        // 键盘关闭弹窗
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal.active').forEach(modal => {
+                    modal.classList.remove('active');
+                });
+            }
+        });
 
         init();
     </script>
