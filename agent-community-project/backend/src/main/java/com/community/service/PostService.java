@@ -162,6 +162,38 @@ public class PostService {
             .collect(Collectors.toList());
     }
     
+    @Transactional
+    public PostDTO pinPost(Long id) {
+        Post post = postRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("帖子不存在"));
+        if (post.getIsDeleted()) {
+            throw new RuntimeException("帖子不存在");
+        }
+        post.setIsPinned(true);
+        post = postRepository.save(post);
+        return toDTO(post);
+    }
+    
+    @Transactional
+    public PostDTO unpinPost(Long id) {
+        Post post = postRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("帖子不存在"));
+        if (post.getIsDeleted()) {
+            throw new RuntimeException("帖子不存在");
+        }
+        post.setIsPinned(false);
+        post = postRepository.save(post);
+        return toDTO(post);
+    }
+    
+    public Page<PostDTO> searchPosts(String keyword, String board, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        if (board != null && !board.isEmpty()) {
+            return postRepository.searchPostsInBoard(keyword, board, pageable).map(this::toDTO);
+        }
+        return postRepository.searchPosts(keyword, pageable).map(this::toDTO);
+    }
+    
     private PostDTO toDTO(Post post) {
         PostDTO dto = new PostDTO();
         dto.setId(post.getId());

@@ -22,4 +22,16 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     void incrementLikes(@Param("postId") Long postId);
     
     List<Post> findTop5ByIsDeletedFalseOrderByLikesCountDesc();
+    
+    // Search posts by title or content
+    @Query("SELECT p FROM Post p WHERE p.isDeleted = false AND " +
+           "(LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(p.content) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    Page<Post> searchPosts(@Param("keyword") String keyword, Pageable pageable);
+    
+    // Search posts within a specific board
+    @Query("SELECT p FROM Post p WHERE p.isDeleted = false AND p.board = :board AND " +
+           "(LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(p.content) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    Page<Post> searchPostsInBoard(@Param("keyword") String keyword, @Param("board") String board, Pageable pageable);
 }

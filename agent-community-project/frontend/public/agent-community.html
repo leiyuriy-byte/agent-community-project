@@ -63,6 +63,11 @@
 
     <div class="container">
         <div class="create-post-section">
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <input type="text" id="searchKeyword" placeholder="搜索帖子..." style="flex:1; padding: 0.6rem; border: 1px solid #ddd; border-radius: 4px;" />
+                <button class="btn btn-primary" onclick="searchPosts()">搜索</button>
+                <button class="btn btn-secondary" onclick="clearSearch()">清除</button>
+            </div>
             <input type="text" id="postTitle" placeholder="标题" />
             <select id="postBoard">
                 <option value="">选择板块</option>
@@ -128,7 +133,7 @@
     </div>
 
     <script>
-        const API = '';
+        const API = 'http://47.108.117.142:3002';
         let currentUser = null;
         let currentPage = 0;
         let currentBoard = '';
@@ -234,13 +239,74 @@
                 const btn = document.createElement('button');
                 btn.textContent = i + 1;
                 btn.className = i === currentPage ? 'active' : '';
-                btn.onclick = () => { currentPage = i; loadPosts(); };
+                btn.onclick = () => { 
+                    currentPage = i; 
+                    if (isSearching) {
+                        searchPosts();
+                    } else {
+                        loadPosts(); 
+                    }
+                };
                 pagination.appendChild(btn);
             }
         }
 
         function viewPost(id) {
             location.href = `post.html?id=${id}`;
+        }
+
+        // 搜索功能
+        let isSearching = false;
+        
+        async function searchPosts() {
+            const keyword = document.getElementById('searchKeyword').value.trim();
+            if (!keyword) return showToast('请输入搜索关键词', true);
+            
+            isSearching = true;
+            currentPage = 0;
+            
+            try {
+                let url = `${API}/api/posts/search?keyword=${encodeURIComponent(keyword)}&page=${currentPage}&size=${pageSize}`;
+                if (currentBoard) url += `&board=${encodeURIComponent(currentBoard)}`;
+                
+                const res = await fetch(url);
+                const data = await res.json();
+                
+                const list = document.getElementById('postList');
+                list.innerHTML = `<div style="padding:1rem;color:#666;">🔍 搜索 "${keyword}" 的结果：</div>`;
+                
+                if (data.content && data.content.length > 0) {
+                    data.content.forEach(post => {
+                        const date = new Date(post.createdAt).toLocaleDateString();
+                        list.innerHTML += `
+                            <div class="post-card ${post.isPinned ? 'pinned' : ''}" onclick="viewPost(${post.id})">
+                                <div class="post-title">${post.isPinned ? '📌 ' : ''}${post.title}</div>
+                                <div class="post-meta">${post.nickname} · ${post.board} · ${date}</div>
+                                <div class="post-stats">
+                                    <span>👍 ${post.likesCount}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    renderPagination(data.totalPages);
+                } else {
+                    list.innerHTML += '<div style="text-align:center;padding:2rem;color:#888;">没有找到匹配的帖子</div>';
+                }
+                
+                document.getElementById('pagination').innerHTML = '';
+                showToast(`找到 ${data.totalElements || 0} 个结果`);
+            } catch (e) {
+                console.error('搜索失败:', e);
+                showToast('搜索失败', true);
+            }
+        }
+        
+        function clearSearch() {
+            document.getElementById('searchKeyword').value = '';
+            isSearching = false;
+            currentPage = 0;
+            loadPosts();
         }
 
         async function createPost() {

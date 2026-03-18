@@ -78,4 +78,35 @@ public class PostController {
     public ResponseEntity<List<PostDTO>> getPinnedPosts() {
         return ResponseEntity.ok(postService.getPinnedPosts());
     }
+    
+    // 置顶帖子（仅管理员）
+    @PostMapping("/{id}/pin")
+    public ResponseEntity<PostDTO> pinPost(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User user) {
+        if (!"admin".equals(user.getRole())) {
+            return ResponseEntity.status(403).build();
+        }
+        return ResponseEntity.ok(postService.pinPost(id));
+    }
+    
+    // 取消置顶（仅管理员）
+    @DeleteMapping("/{id}/pin")
+    public ResponseEntity<PostDTO> unpinPost(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User user) {
+        if (!"admin".equals(user.getRole())) {
+            return ResponseEntity.status(403).build();
+        }
+        return ResponseEntity.ok(postService.unpinPost(id));
+    }
+    
+    @GetMapping("/search")
+    public ResponseEntity<Page<PostDTO>> searchPosts(
+            @RequestParam String keyword,
+            @RequestParam(required = false) String board,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(postService.searchPosts(keyword, board, page, size));
+    }
 }
